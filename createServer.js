@@ -9,13 +9,6 @@ function createCompiler (inConfig) {
   const webpack = require('webpack')
   const config = Object.assign({ }, inConfig)
 
-  const OccurrenceOrderPlugin = webpack.optimize.OccurrenceOrderPlugin
-  const NoErrorsPlugin = webpack.NoErrorsPlugin
-  const plugins = (config.plugins || [ ]).slice()
-
-  ensurePlugin(OccurrenceOrderPlugin)
-  ensurePlugin(NoErrorsPlugin)
-
   if (typeof config.entry !== 'string') {
     throw new Error('config.entry should be a string.')
   }
@@ -36,17 +29,6 @@ function createCompiler (inConfig) {
   }
 
   config.devtool = config.devtool || 'eval'
-
-  config.plugins = plugins
-
-  function ensurePlugin (Plugin) {
-    if (plugins.some(plugin => plugin instanceof Plugin)) {
-      debug('%s already exists in webpack configuration, skipping.', Plugin.name)
-    } else {
-      debug('Adding %s to configuration.', Plugin.name)
-      plugins.push(new Plugin())
-    }
-  }
 
   return webpack(config)
 }

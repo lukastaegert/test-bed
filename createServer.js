@@ -60,7 +60,7 @@ module.exports = function createServer (config) {
   app.use(require('webpack-dev-middleware')(compiler, Object.assign({
     quiet: true,
     publicPath: '/test-assets/',
-    stats: { colors: true }
+    stats: { all: false, colors: true }
   }, webpackMiddlewareConfig || { })))
 
   io.on('connection', function (socket) {
@@ -77,7 +77,7 @@ module.exports = function createServer (config) {
     socket.on('disconnect', onDisconnected)
   })
 
-  compiler.hooks.done.tap('TestBed', function (stats) {
+  compiler.hooks.done.tap('TestBed', stats => {
     const compilation = stats.compilation
     const json = stats.toJson()
     debug('Hash: %s', json.hash)
@@ -85,7 +85,7 @@ module.exports = function createServer (config) {
       return
     }
     lastHash = json.hash
-    const builtModules = findBuiltModules()
+    const builtModules = compilation.modules.filter(module => module.built)
     const affectedModuleIds = calculateAffectedModuleIds(builtModules)
     const errors = json.errors || [ ]
     debug('Built modules: %o', builtModules.map(builtModule => builtModule.id))
@@ -114,14 +114,6 @@ module.exports = function createServer (config) {
         )
         for (let parent of parents) traverse(parent)
       }
-    }
-
-    function findBuiltModules () {
-      const built = [ ]
-      for (let chunk of compilation.chunks) {
-        built.push.apply(built, chunk.modules.filter(module => module.built))
-      }
-      return built
     }
   })
 

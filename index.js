@@ -32,23 +32,8 @@ const shouldOpenBrowser = getShouldOpenBrowser(argv, config)
 const port = getPort(argv, config)
 const server = require('./createServer')(config)
 
-server.listen(port, function () {
-  const actualPort = server.address().port
-  const portNumberPadding = ' '.repeat(5 - String(actualPort).length)
-  console.log('')
-  console.log('++=====================================================++')
-  console.log('|| test-bed is now running                             ||')
-  console.log('||                                                     ||')
-  if (shouldOpenBrowser) {
-    console.log('|| If your browser does not open automatically, visit  ||')
-    console.log(`|| http://localhost:${actualPort}/ in order to run tests.      ${portNumberPadding}||`)
-  } else {
-    console.log(`|| Please open http://localhost:${actualPort}/ in your browser ${portNumberPadding}||`)
-    console.log('|| in order to run tests.                              ||')
-  }
-  console.log('++=====================================================++')
-  console.log('')
-  shouldOpenBrowser && require('opn')(`http://localhost:${actualPort}/`)
+server.listen(port, () => {
+  shouldOpenBrowser && require('opn')(`http://localhost:${server.address().port}/`)
 })
 
 function getPort(argv, config) {

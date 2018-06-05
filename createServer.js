@@ -77,7 +77,7 @@ module.exports = function createServer (config) {
     socket.on('disconnect', onDisconnected)
   })
 
-  compiler.plugin('done', function (stats) {
+  compiler.hooks.done.tap('TestBed', function (stats) {
     const compilation = stats.compilation
     const json = stats.toJson()
     debug('Hash: %s', json.hash)
